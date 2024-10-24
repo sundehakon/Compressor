@@ -3,19 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rust WebAssembly</title>
+    <title>ImComp</title>
 </head>
 <body>
-    <h1>Rust WebAssembly Example</h1>
-    <button id="greet-btn">Greet</button>
+    <h1>Image Compressor</h1>
+
+    <input type="file" id="image-input" accept="image/*">
+    <button id="process-btn">Process Image</button>
+
     <script type="module">
         import init, { greet } from './pkg/compressor.js';
-
         init().then(() => {
-            document.getElementById("greet-btn").addEventListener("click", () => {
-                alert(greet("World"));
+            document.getElementById("process-btn").addEventListener("click", async () => {
+                const fileInput = document.getElementById('image-input');
+                const file = fileInput.files[0];
+
+                if (file) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const byteArray = new Uint8Array(arrayBuffer);
+
+                    const compressedImageData = process_image(byteArray);
+
+                    const blob = new Blob
+                } else {
+                    alert("Please select an image file.");
+                }
             });
-        });
+        }).catch(console.error);
     </script>
 </body>
 </html>
