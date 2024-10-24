@@ -3,7 +3,7 @@ use image::ImageOutputFormat;
 use std::io::Cursor;
 
 #[wasm_bindgen]
-pub fn process_image(data: Vec<u8>) -> Vec<u8> {
+pub fn process_image(data: &[u8]) -> Vec<u8> {
     let img = image::load_from_memory(&data).expect("Failed to load image");
 
     let mut compressed_data = Cursor::new(Vec::new());

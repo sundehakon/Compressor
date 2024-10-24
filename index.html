@@ -7,15 +7,17 @@
 </head>
 <body>
     <h1>Image Compressor</h1>
-    
-    <input type="file" id="image-input" accept="image/*">
-    <button id="process-btn">Process Image</button>
+
+    <p>Compresses your image file and turns it into a JPG!</p>
 
     <div>
         <p>Original Image Size: <span id="original-size">0</span> bytes</p>
         <p>Compressed Image Size: <span id="compressed-size">0</span> bytes</p>
     </div>
     
+    <input type="file" id="image-input" accept="image/*">
+    <button id="process-btn">Compress Image</button>
+
     <a id="download-btn" style="display: none;">Download Compressed Image</a>
     
     <script type="module">
@@ -39,18 +41,23 @@
                     const arrayBuffer = await file.arrayBuffer();
                     const byteArray = new Uint8Array(arrayBuffer);
 
-                    const compressedImageData = process_image(byteArray);
+                    try {
+                        const compressedImageData = process_image(byteArray);
 
-                    document.getElementById("compressed-size").innerText = compressedImageData.length;
+                        document.getElementById("compressed-size").innerText = compressedImageData.length;
 
-                    const blob = new Blob([compressedImageData], { type: "image/jpeg" });
-                    const url = URL.createObjectURL(blob);
+                        const blob = new Blob([compressedImageData], { type: "image/jpeg" });
+                        const url = URL.createObjectURL(blob);
 
-                    const downloadButton = document.getElementById("download-btn");
-                    downloadButton.href = url;
-                    downloadButton.download = "compressed_image.jpg";
-                    downloadButton.innerText = "Download Compressed Image"; 
-                    downloadButton.style.display = "inline"; 
+                        const downloadButton = document.getElementById("download-btn");
+                        downloadButton.href = url;
+                        downloadButton.download = "compressed_image.jpg";
+                        downloadButton.innerText = "Download Compressed Image"; 
+                        downloadButton.style.display = "inline"; 
+                    } catch (error) {
+                        console.error("Error processing image:", error);
+                        alert("Failed to process image. Please check the console for details.");
+                    }
                 } else {
                     alert("Please select an image file.");
                 }
