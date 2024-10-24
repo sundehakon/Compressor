@@ -21,9 +21,9 @@
     <a id="download-btn" style="display: none;">Download Compressed Image</a>
     
     <script type="module">
-        import init, { process_image } from './pkg/compressor.js';
-
-        init().then(() => {
+        import init, { process_image, get_compressed_size } from './pkg/compressor.js';
+    
+        init().then(wasm => {
             document.getElementById("image-input").addEventListener("change", (event) => {
                 const file = event.target.files[0];
                 if (file) {
@@ -32,37 +32,41 @@
                     document.getElementById("original-size").innerText = 0;
                 }
             });
-
+    
             document.getElementById("process-btn").addEventListener("click", async () => {
                 const fileInput = document.getElementById('image-input');
                 const file = fileInput.files[0];
-
+    
                 if (file) {
                     const arrayBuffer = await file.arrayBuffer();
                     const byteArray = new Uint8Array(arrayBuffer);
-
-                    try {
-                        const compressedImageData = process_image(byteArray);
-
-                        document.getElementById("compressed-size").innerText = compressedImageData.length;
-
-                        const blob = new Blob([compressedImageData], { type: "image/jpeg" });
-                        const url = URL.createObjectURL(blob);
-
-                        const downloadButton = document.getElementById("download-btn");
-                        downloadButton.href = url;
-                        downloadButton.download = "compressed_image.jpg";
-                        downloadButton.innerText = "Download Compressed Image"; 
-                        downloadButton.style.display = "inline"; 
-                    } catch (error) {
-                        console.error("Error processing image:", error);
-                        alert("Failed to process image. Please check the console for details.");
+    
+                    const compressedPtr = process_image(byteArray);
+    
+                    const compressedSize = get_compressed_size(byteArray);
+    
+                    if (compressedPtr === 0 || compressedSize === 0) {
+                        alert("Compression failed or returned empty data.");
+                        return;
                     }
+    
+                    const compressedData = new Uint8Array(wasm.memory.buffer, compressedPtr, compressedSize);
+                    const blob = new Blob([compressedData], { type: "image/jpeg" });
+                    const url = URL.createObjectURL(blob);
+    
+                    const downloadButton = document.getElementById("download-btn");
+                    downloadButton.href = url;
+                    downloadButton.download = "compressed_image.jpg";
+                    downloadButton.innerText = "Download Compressed Image"; 
+                    downloadButton.style.display = "inline"; 
+
+                    document.getElementById("compressed-size").innerText = compressedSize;
                 } else {
                     alert("Please select an image file.");
                 }
             });
         }).catch(console.error);
     </script>
+      
 </body>
 </html>
