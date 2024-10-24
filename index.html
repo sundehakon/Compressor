@@ -3,17 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImComp</title>
+    <title>Image Compressor</title>
 </head>
 <body>
     <h1>Image Compressor</h1>
-
+    
     <input type="file" id="image-input" accept="image/*">
     <button id="process-btn">Process Image</button>
 
+    <div>
+        <p>Original Image Size: <span id="original-size">0</span> bytes</p>
+        <p>Compressed Image Size: <span id="compressed-size">0</span> bytes</p>
+    </div>
+    
+    <a id="download-btn" style="display: none;">Download Compressed Image</a>
+    
     <script type="module">
-        import init, { greet } from './pkg/compressor.js';
+        import init, { process_image } from './pkg/compressor.js';
+
         init().then(() => {
+            document.getElementById("image-input").addEventListener("change", (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    document.getElementById("original-size").innerText = file.size;
+                } else {
+                    document.getElementById("original-size").innerText = 0;
+                }
+            });
+
             document.getElementById("process-btn").addEventListener("click", async () => {
                 const fileInput = document.getElementById('image-input');
                 const file = fileInput.files[0];
@@ -24,7 +41,16 @@
 
                     const compressedImageData = process_image(byteArray);
 
-                    const blob = new Blob
+                    document.getElementById("compressed-size").innerText = compressedImageData.length;
+
+                    const blob = new Blob([compressedImageData], { type: "image/jpeg" });
+                    const url = URL.createObjectURL(blob);
+
+                    const downloadButton = document.getElementById("download-btn");
+                    downloadButton.href = url;
+                    downloadButton.download = "compressed_image.jpg";
+                    downloadButton.innerText = "Download Compressed Image"; 
+                    downloadButton.style.display = "inline"; 
                 } else {
                     alert("Please select an image file.");
                 }
