@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust WebAssembly</title>
+</head>
+<body>
+    <h1>Rust WebAssembly Example</h1>
+    <button id="greet-btn">Greet</button>
+    <script type="module">
+        import init, { greet } from './pkg/compressor.js';
+
+        init().then(() => {
+            document.getElementById("greet-btn").addEventListener("click", () => {
+                alert(greet("World"));
+            });
+        });
+    </script>
+</body>
+</html>
